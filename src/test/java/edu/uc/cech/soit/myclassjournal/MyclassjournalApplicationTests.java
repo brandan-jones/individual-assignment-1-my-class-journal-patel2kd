@@ -1,10 +1,14 @@
 package edu.uc.cech.soit.myclassjournal;
 
+import edu.uc.cech.soit.myclassjournal.dao.IJournalDAO;
 import edu.uc.cech.soit.myclassjournal.dto.JournalEntry;
 import edu.uc.cech.soit.myclassjournal.service.IJournalService;
+import edu.uc.cech.soit.myclassjournal.service.JournalService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
@@ -14,8 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 class MyclassjournalApplicationTests {
 
-    @Autowired
-    IJournalService journalService;
+
+    private IJournalService journalService;
+    private JournalEntry journalEntry = new JournalEntry();
+    @MockBean
+    private IJournalDAO journalDAO;
 
     @Test
     void contextLoads() {
@@ -41,28 +48,26 @@ class MyclassjournalApplicationTests {
      * Validate that the JournalService can save and return Journal Entries.
      */
     @Test
-    void verifyAddAndRemoveJournalEntries() {
+    void verifyAddAndRemoveJournalEntries() throws Exception {
         String notes =  "My first entry!";
         String date = "October 2021";
 
         JournalEntry journalEntry = new JournalEntry();
         journalEntry.setNotes(notes);
         journalEntry.setDate(date);
+        Mockito.when(journalDAO.save(journalEntry)).thenReturn(journalEntry);
+        journalService = new JournalService(journalDAO);
 
         journalService.save(journalEntry);
 
         List<JournalEntry> journalEntries = journalService.fetchAll();
         boolean journalEntryPresent = false;
         for (JournalEntry je : journalEntries) {
-            if (je.getNotes().equals(notes) && je.getDate().equals(date)) {
+            if (je.getNotes().equals(notes) && je.getDate().equals(date)){
                 journalEntryPresent = true;
                 break;
             }
         }
-
         assertTrue(journalEntryPresent);
-
-
     }
-
 }
