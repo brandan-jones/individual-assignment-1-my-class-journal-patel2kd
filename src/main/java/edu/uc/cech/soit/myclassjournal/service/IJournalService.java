@@ -19,5 +19,5 @@ public interface IJournalService {
      * Return all journal entries.
      * @return a collection of all journal entries.
      */
-    List<JournalEntry> fetchAll();
+    List<JournalEntry> fetchAll() throws Exception;
 }
